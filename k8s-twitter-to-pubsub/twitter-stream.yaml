@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: twitter-stream
+  labels:
+    name: twitter-stream
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: twitter-stream
+    spec:
+      containers:
+      - name: twitter-to-pubsub
+        # Change this to the name of your image
+        image: gcr.io/<YOUR_PROJECT_ID>/pubsub_pipeline
+        env:
+        - name: PROCESSINGSCRIPT
+          value: twitter-to-pubsub
+        # Change this to your pubsub topic
+        - name: PUBSUB_TOPIC
+          value: projects/<YOUR_PROJECT_ID>/topics/blackfridaytweets
+        # Change the following four settings to your twitter credentials
+        # information.
+        - name: CONSUMERKEY
+          value: <YOUR_CONSUMER_KEY>
+        - name: CONSUMERSECRET
+          value: <YOUR_CONSUMER_SECRET>
+        - name: ACCESSTOKEN
+          value: <YOUR_ACCESS_TOKEN>
+        - name: ACCESSTOKENSEC
+          value: <YOUR_ACCESS_TOKEN_SECRET>
