@@ -17,8 +17,8 @@ The repository contains a bash script that automates most of the work. However, 
 - Set the Google Cloud Platform zone: `gcloud config set compute/zone <COMPUTE_ZONE>` (replace `<COMPUTE_ZONE>` with your preferred zone. You can list the available zones with `gcloud compute zones list`).
 - Create a GCS bucket as a staging location for Dataflow deployment `gsutil mb -l <LOCATION> gs://gcp-black-friday-analytics-staging` (replace `<LOCATION>` with your preferred location. Available choices are `US`, `EU` or `ASIA`. Choose the location depending on the compute zone you previously selected.
 - Replace all occurrences of `<YOUR_PROJECT_ID>` with your actual Project ID within the K8S Yaml file. You can do this with this one-liner, if you are running commands from the Cloud Shell: `sed -i -- 's@<YOUR_PROJECT_ID>@'"$DEVSHELL_PROJECT_ID"'@g' gcp-black-friday-analytics/k8s-twitter-to-pubsub/twitter-stream.yaml`
-- [Create a Twitter application](https://apps.twitter.com/app/new) and paste the required information in the gcp-black-friday-analytics/k8s-twitter-to-pubsub/twitter-stream.yaml file.
-- launch the start.sh file to provision and start the processing pipeline: `bash start.sh`.
+- [Create a Twitter application](https://apps.twitter.com/app/new) and paste the required information in the gcp-black-friday-analytics/k8s-twitter-to-pubsub/twitter-stream.yaml file. Use your preferred text editor, like `vi` or `nano`: `nano gcp-black-friday-analytics/k8s-twitter-to-pubsub/twitter-stream.yaml`
+- launch the start.sh file to provision and start the processing pipeline: `bash gcp-black-friday-analytics/start.sh`.
 
 ## Credits
 The Python appplication that collects tweets and publish them on Pub/Sub comes from the really nice example "Real-Time Data Analysis with Kubernetes, Cloud Pub/Sub, and BigQuery" published here: https://cloud.google.com/solutions/real-time/kubernetes-pubsub-bigquery.
