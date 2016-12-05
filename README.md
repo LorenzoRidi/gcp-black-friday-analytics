@@ -18,3 +18,6 @@ The repository contains a bash script that automates most of the work. However, 
 - Replace all occurrences of `<YOUR_PROJECT_ID>` with your actual Project ID within the K8S Yaml file. You can do this with this one-liner, if you are running commands from the Cloud Shell: `sed -i -- 's@<YOUR_PROJECT_ID>@'"$DEVSHELL_PROJECT_ID"'@g' gcp-black-friday-analytics/k8s-twitter-to-pubsub/twitter-stream.yaml`
 - [Create a Twitter application](https://apps.twitter.com/app/new) and paste the required information in the gcp-black-friday-analytics/k8s-twitter-to-pubsub/twitter-stream.yaml file.
 - launch the start.sh file to provision and start the processing pipeline: `bash start.sh`.
+
+## Credits
+The Python app that collects tweets and publish them on Pub/Sub comes from the really nice example "Real-Time Data Analysis with Kubernetes, Cloud Pub/Sub, and BigQuery" published here: https://cloud.google.com/solutions/real-time/kubernetes-pubsub-bigquery.
