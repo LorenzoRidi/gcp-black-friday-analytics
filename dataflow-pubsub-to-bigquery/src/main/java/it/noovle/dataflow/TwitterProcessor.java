@@ -79,13 +79,6 @@ public class TwitterProcessor {
     private static final class DoFilterAndProcess extends DoFn<String, String> {
         private static final long serialVersionUID = 1L;
 
-        private boolean negative = false;
-
-        public DoFilterAndProcess withNegative(boolean negative) {
-            this.negative = negative;
-            return this;
-        }
-
         @Override
         public void processElement(DoFn<String, String>.ProcessContext c) throws Exception {
             try {
@@ -93,8 +86,8 @@ public class TwitterProcessor {
 
                 if (jsonTweet != null && jsonTweet.getAsJsonPrimitive("text") != null && jsonTweet.getAsJsonPrimitive("lang") != null) {
 
-                    // Process the element only if it contains "blackfriday" (even not as an hashtag) - or do the contrary, if negative is true (this happens only during tests, if the pipeline is run in batch mode)
-                    if ((negative ^ (jsonTweet.getAsJsonPrimitive("text").getAsString().toLowerCase().contains("blackfriday"))) && jsonTweet.getAsJsonPrimitive("lang").getAsString().equalsIgnoreCase("en")) {
+                    // Process the element only if it contains "blackfriday" (even not as an hashtag)
+                    if ((jsonTweet.getAsJsonPrimitive("text").getAsString().toLowerCase().contains("blackfriday")) && jsonTweet.getAsJsonPrimitive("lang").getAsString().equalsIgnoreCase("en")) {
 
                         LOG.info("Processing tweet: " + c.element());
 
@@ -122,16 +115,11 @@ public class TwitterProcessor {
 
     	// Setup Dataflow options
         DataflowPipelineOptions options = PipelineOptionsFactory.fromArgs(args).withValidation().create().as(DataflowPipelineOptions.class);
-        if (options.isStreaming()) {
-            options.setRunner(DataflowPipelineRunner.class);
-        } else {
-            options.setRunner(DirectPipelineRunner.class);
-            options.setTempLocation("gs://codemotion-2016-demo-tmp");
-        }
-        options.setProject("codemotion-2016-demo");
-        options.setStagingLocation("gs://codemotion-2016-demo-staging");
+        options.setRunner(DataflowPipelineRunner.class);
         options.setAutoscalingAlgorithm(AutoscalingAlgorithmType.THROUGHPUT_BASED);
         options.setMaxNumWorkers(3);
+
+        String projectId = options.getProject();
 
         // Create TableSchemas from their String representation
         TableSchema tweetsTableSchema;
@@ -146,36 +134,33 @@ public class TwitterProcessor {
 
         Pipeline p = Pipeline.create(options);
 
-        // If the pipeline is running in Streaming mode, read tweets from Pub/Sub. Otherwise, read sample tweets from Google Cloud Storage
+        // Read tweets from Pub/Sub
         PCollection<String> tweets = null;
-        if (options.isStreaming()) {
-            tweets = p.apply(PubsubIO.Read.named("Read tweets from PubSub").topic("projects/codemotion-2016-demo/topics/blackfridaytweets"));
-        } else {
-            tweets = p.apply(TextIO.Read.named("Read tweets.from GCS").from("gs://codemotion-2016-demo-output/tweets.json"));
-        }
+        tweets = p.apply(PubsubIO.Read.named("Read tweets from PubSub").topic("projects/" + projectId + "/topics/blackfridaytweets"));
 
         // Format tweets for BigQuery
         PCollection<TableRow> formattedTweets = tweets.apply(ParDo.named("Format tweets for BigQuery").of(new DoFormat()));
 
         // Create a TableReference for the destination table
         TableReference tableReference = new TableReference();
-        tableReference.setProjectId("codemotion-2016-demo");
-        tableReference.setDatasetId("rtda");
+        tableReference.setProjectId(projectId);
+        tableReference.setDatasetId("black_friday_analytics");
         tableReference.setTableId("tweets_raw");
 
         // Write tweets to BigQuery
         formattedTweets.apply(BigQueryIO.Write.named("Write tweets to BigQuery").to(tableReference).withSchema(tweetsTableSchema).withCreateDisposition(BigQueryIO.Write.CreateDisposition.CREATE_IF_NEEDED).withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_APPEND).withoutValidation());
 
-        // Filter and annotate tweets with their sentiment
-        PCollection<String> filteredTweets = tweets.apply(ParDo.named("Filter and annotate tweets").of(new DoFilterAndProcess().withNegative(!options.isStreaming())));
+        // Filter and annotate tweets with their sentiment from NL API
+        // Note: if the pipeline is run as a batch pipeline, the filter condition is inverted
+        PCollection<String> filteredTweets = tweets.apply(ParDo.named("Filter and annotate tweets").of(new DoFilterAndProcess();
 
         // Format tweets for BigQuery 
         PCollection<TableRow> filteredFormattedTweets = filteredTweets.apply(ParDo.named("Format annotated tweets for BigQuery").of(new DoFormat()));
 
 		// Create a TableReference for the destination table
         TableReference filteredTableReference = new TableReference();
-        filteredTableReference.setProjectId("codemotion-2016-demo");
-        filteredTableReference.setDatasetId("rtda");
+        filteredTableReference.setProjectId(projectId);
+        filteredTableReference.setDatasetId("black_friday_analytics");
         filteredTableReference.setTableId("tweets_sentiment");
 
         // Write tweets to BigQuery
@@ -264,12 +249,14 @@ public class TwitterProcessor {
             }
 
             // Remove ignored fields
+            // TODO: modify schema to include also these fields
             for (String key : IGNORED_FIELDS) {
                 if (objEl.has(key)) {
                     objEl.remove(key);
                 }
             }
             // Remove fields marked for removal
+            // TODO: modify schema to include also these fields
             for (String key : toBeRemoved) {
                 objEl.remove(key);
             }
@@ -282,7 +269,7 @@ public class TwitterProcessor {
     }
 
     /**
-     * Creates a TableRow object from a String, using a JsonFactory
+     * Creates a TableRow object from its String JSON representation, using a JsonFactory
      */
     private static TableRow createTableRow(String tweet) throws IOException {
         JsonObject jsonTweet = (JsonObject) cleanup(new JsonParser().parse(tweet).getAsJsonObject());

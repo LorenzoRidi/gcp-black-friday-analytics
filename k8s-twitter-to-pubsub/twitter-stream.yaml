@@ -13,12 +13,8 @@ spec:
     spec:
       containers:
       - name: twitter-to-pubsub
-        # Change this to the name of your image
         image: gcr.io/<YOUR_PROJECT_ID>/pubsub_pipeline
         env:
-        - name: PROCESSINGSCRIPT
-          value: twitter-to-pubsub
-        # Change this to your pubsub topic
         - name: PUBSUB_TOPIC
           value: projects/<YOUR_PROJECT_ID>/topics/blackfridaytweets
         # Change the following four settings to your twitter credentials
