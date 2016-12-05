@@ -152,7 +152,7 @@ public class TwitterProcessor {
 
         // Filter and annotate tweets with their sentiment from NL API
         // Note: if the pipeline is run as a batch pipeline, the filter condition is inverted
-        PCollection<String> filteredTweets = tweets.apply(ParDo.named("Filter and annotate tweets").of(new DoFilterAndProcess();
+        PCollection<String> filteredTweets = tweets.apply(ParDo.named("Filter and annotate tweets").of(new DoFilterAndProcess()));
 
         // Format tweets for BigQuery 
         PCollection<TableRow> filteredFormattedTweets = filteredTweets.apply(ParDo.named("Format annotated tweets for BigQuery").of(new DoFormat()));
