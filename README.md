@@ -1,10 +1,11 @@
 # gcp-black-friday-analytics
 Analyze Black Friday tweets with a Serverless Data Processing pipeline on Google Cloud Platform.
-The architecture includes:
-- a Kubernetes cluster to run a Python application that gathers tweets
-- a Google Cloud Pub/Sub topic
-- a Google Cloud Dataflow pipeline that uses the Natural Language API to get the sentiment of each tweet
-- a BigQuery dataset that will contain two tables, respectively for raw and annotated tweets.
+
+The architecture consists of:
+- a Google Container Engine cluster running a Python application that gathers tweets and sends them to Google Pub/Sub;
+- a Google Cloud Pub/Sub topic;
+- a Google Cloud Dataflow pipeline that reads from the Pub/Sub topic and uses the Natural Language API to retrieve the sentiment of each tweet;
+- a Google BigQuery dataset containing two tables, respectively for "raw" and "annotated" tweets.
 
 ## Setup
 The repository contains a bash script that automates most of the work. However, there is still something you have to do yourself:
@@ -20,4 +21,4 @@ The repository contains a bash script that automates most of the work. However, 
 - launch the start.sh file to provision and start the processing pipeline: `bash start.sh`.
 
 ## Credits
-The Python app that collects tweets and publish them on Pub/Sub comes from the really nice example "Real-Time Data Analysis with Kubernetes, Cloud Pub/Sub, and BigQuery" published here: https://cloud.google.com/solutions/real-time/kubernetes-pubsub-bigquery.
+The Python appplication that collects tweets and publish them on Pub/Sub comes from the really nice example "Real-Time Data Analysis with Kubernetes, Cloud Pub/Sub, and BigQuery" published here: https://cloud.google.com/solutions/real-time/kubernetes-pubsub-bigquery.
