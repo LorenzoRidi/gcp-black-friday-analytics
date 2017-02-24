@@ -1,6 +1,10 @@
 # gcp-black-friday-analytics
 Analyze Black Friday tweets with a Serverless Data Processing pipeline on Google Cloud Platform.
 
+This repository hosts the codebase for the example posted:
+- on the Noovle Cloud Academy blog (Italian language): http://www.noovle.it/cracking-black-friday-serverless-data-analysis-google-cloud-platform.html
+- on the Google Big Data and Machine Learning blog (English language): https://cloud.google.com/blog/big-data/2017/02/adding-machine-learning-to-a-serverless-data-analysis-pipeline
+
 The architecture consists of:
 - a Google Container Engine cluster running a Python application that gathers tweets and sends them to Google Pub/Sub;
 - a Google Cloud Pub/Sub topic;
