@@ -10,10 +10,10 @@ gcloud docker -- push gcr.io/$DEVSHELL_PROJECT_ID/pubsub_pipeline
 gcloud beta pubsub topics create blackfridaytweets
 
 # Create a Google Container Engine Cluster (enabled to write on Pub/Sub)
-gcloud container clusters create gcp-black-friday-analytics-cluster --num-nodes=1 --scopes=https://www.googleapis.com/auth/pubsub
+gcloud container clusters create $DEVSHELL_PROJECT_ID-cluster --num-nodes=1 --scopes=https://www.googleapis.com/auth/pubsub
 
 # Acquire the credentials to access the K8S Master
-gcloud container clusters get-credentials gcp-black-friday-analytics-cluster
+gcloud container clusters get-credentials $DEVSHELL_PROJECT_ID-cluster
 
 # Deploy our application on the cluster, within a ReplicationController
 kubectl create -f gcp-black-friday-analytics/k8s-twitter-to-pubsub/twitter-stream.yaml
