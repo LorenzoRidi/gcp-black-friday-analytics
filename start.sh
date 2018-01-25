@@ -4,7 +4,7 @@
 docker build -t gcr.io/$DEVSHELL_PROJECT_ID/pubsub_pipeline gcp-black-friday-analytics/k8s-twitter-to-pubsub
 
 # Save the image on Google Container Registry
-gcloud docker push gcr.io/$DEVSHELL_PROJECT_ID/pubsub_pipeline
+gcloud docker -- push gcr.io/$DEVSHELL_PROJECT_ID/pubsub_pipeline
 
 # Create a Pub/Sub topic that will collect all the tweets
 gcloud beta pubsub topics create blackfridaytweets
