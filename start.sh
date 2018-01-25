@@ -21,6 +21,9 @@ kubectl create -f gcp-black-friday-analytics/k8s-twitter-to-pubsub/twitter-strea
 # Create the BigQuery dataset
 bq mk black_friday_analytics
 
+# Create a staging bucket
+gsutil mb gs://${DEVSHELL_PROJECT_ID}-staging
+
 # Launch the Dataflow Pipeline
 cd gcp-black-friday-analytics/dataflow-pubsub-to-bigquery/
-mvn compile exec:java -Dexec.mainClass=it.noovle.dataflow.TwitterProcessor -Dexec.args="--streaming --stagingLocation=gs://gcp-black-friday-analytics-staging --project=$DEVSHELL_PROJECT_ID"
+mvn compile exec:java -Dexec.mainClass=it.noovle.dataflow.TwitterProcessor -Dexec.args="--streaming --stagingLocation=gs://${DEVSHELL_PROJECT_ID}-staging --project=$DEVSHELL_PROJECT_ID"
